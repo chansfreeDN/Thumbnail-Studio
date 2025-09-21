@@ -164,9 +164,9 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 750 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 620 } },
-    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 420 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 780 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 650 } },
+    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 460 } },
     { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
     { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
     { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 400 } },
@@ -958,11 +958,11 @@ const App = () => {
             <p className="card-description">블로그 글의 제목과 내용을 입력하면 AI가 썸네일에 어울리는 제목, 카테고리, 스타일을 자동으로 추천해줍니다.</p>
             <div className="form-group">
                 <label htmlFor="blog-title-input">블로그 제목:</label>
-                <textarea id="blog-title-input" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} placeholder="예: 효율적인 재택 근무를 위한 5가지 팁" rows={2}/>
+                <textarea id="blog-title-input" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} placeholder="예: 효율적인 재택 근무를 위한 5가지 팁" />
             </div>
             <div className="form-group">
                 <label htmlFor="blog-desc-input">블로그 내용 (요약):</label>
-                <textarea id="blog-desc-input" value={blogDescription} onChange={e => setBlogDescription(e.target.value)} placeholder="예: 재택 근무의 생산성을 높이고 워라밸을 지키는 구체적인 방법을 알아봅니다." rows={4}/>
+                <textarea id="blog-desc-input" value={blogDescription} onChange={e => setBlogDescription(e.target.value)} placeholder="예: 재택 근무의 생산성을 높이고 워라밸을 지키는 구체적인 방법을 알아봅니다." />
             </div>
             <button className="btn btn-ai" onClick={handleAiGeneration} disabled={isLoading}>
                 {isLoading ? (
