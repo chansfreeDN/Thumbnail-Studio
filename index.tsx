@@ -164,9 +164,9 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 680 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 520 } },
-    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 340 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 720 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 580 } },
+    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 380 } },
     { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
     { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
     { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 400 } },
