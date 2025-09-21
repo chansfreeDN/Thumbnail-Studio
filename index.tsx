@@ -162,9 +162,9 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 620 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 500 } },
-    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 500 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 580 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 650 } },
+    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 460 } },
     { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
     { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
     { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 400 } },
@@ -718,8 +718,14 @@ const App = () => {
 
         } catch (error) {
             console.error('AI 썸네일 생성에 실패했습니다.', error);
-            const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-            alert(`AI 썸네일 생성 중 오류가 발생했습니다: ${errorMessage}`);
+            let errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+            
+            // Provide a more helpful message for the specific API key error
+            if (errorMessage.includes('서버에 API 키가 설정되지 않았습니다')) {
+                errorMessage += '\n\nVercel 대시보드 > Settings > Environment Variables에서 API_KEY가 정확히 설정되었는지 확인 후, 다시 배포(Redeploy)해주세요.';
+            }
+
+            alert(`AI 썸네일 생성 중 오류가 발생했습니다:\n${errorMessage}`);
         } finally {
             setIsLoading(false);
         }

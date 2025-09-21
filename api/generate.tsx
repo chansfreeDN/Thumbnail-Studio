@@ -7,20 +7,29 @@ const CATEGORIES = [
 ];
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    console.log('--- [/api/generate] 함수 실행 시작 ---');
+
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Only POST requests allowed' });
+        console.warn(`잘못된 요청 메소드: ${req.method}`);
+        return res.status(405).json({ message: 'POST 요청만 허용됩니다.' });
     }
 
-    if (!process.env.API_KEY) {
-        return res.status(500).json({ error: 'API key not configured on the server.' });
+    const apiKey = process.env.API_KEY;
+
+    if (!apiKey) {
+        console.error('치명적 오류: API_KEY 환경 변수를 찾을 수 없습니다.');
+        return res.status(500).json({ error: '서버에 API 키가 설정되지 않았습니다. Vercel 프로젝트 설정을 확인해주세요.' });
     }
+    console.log('API 키를 성공적으로 로드했습니다.');
 
     const { blogTitle, blogDescription } = req.body;
     if (!blogTitle || !blogDescription) {
-        return res.status(400).json({ error: 'Blog title and description are required.' });
+        console.warn('필수 정보 누락: 블로그 제목 또는 설명이 없습니다.');
+        return res.status(400).json({ error: '블로그 제목과 설명은 필수입니다.' });
     }
     
     try {
+        console.log('Gemini API 요청을 시작합니다...');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const prompt = `
             다음 블로그 포스트 내용을 기반으로, 사람들의 시선을 사로잡을 만한 매력적인 썸네일 제목과 부제목을 만들어줘. 그리고 주어진 카테고리 목록 중에서 가장 적합한 카테고리 하나를 추천해줘.
@@ -61,14 +70,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
         });
         
+        console.log('Gemini API로부터 성공적으로 응답을 받았습니다.');
         const cleanedText = response.text.replace(/```json\n?/, '').replace(/```$/, '');
         const result = JSON.parse(cleanedText);
         
         return res.status(200).json(result);
 
     } catch (error) {
-        console.error('AI thumbnail generation failed:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        return res.status(500).json({ error: `AI thumbnail generation failed: ${errorMessage}` });
+        console.error('AI 썸네일 생성 중 오류 발생:', error);
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+        return res.status(500).json({ error: `AI 썸네일 생성에 실패했습니다: ${errorMessage}` });
     }
 }
