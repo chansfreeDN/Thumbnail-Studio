@@ -162,8 +162,8 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 620 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 550 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 580 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 650 } },
     { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 460 } },
     { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
     { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
@@ -701,7 +701,8 @@ const App = () => {
             const result = await apiResponse.json();
 
             if (!apiResponse.ok) {
-                throw new Error(result.error || 'API 요청에 실패했습니다.');
+                const serverErrorMessage = result.error || '알 수 없는 서버 오류가 발생했습니다.';
+                throw new Error(serverErrorMessage);
             }
 
             setTitle(result.thumbnailTitle);
@@ -717,15 +718,18 @@ const App = () => {
             }
 
         } catch (error) {
-            console.error('AI 썸네일 생성에 실패했습니다.', error);
-            let errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+            console.error('AI 썸네일 생성 요청에 실패했습니다.', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
+            let userFriendlyMessage = `AI 썸네일 생성 중 오류가 발생했습니다.\n\n[오류 내용]\n${errorMessage}`;
             
-            // Provide a more helpful message for the specific API key error
-            if (errorMessage.includes('서버에 API 키가 설정되지 않았습니다')) {
-                errorMessage += '\n\nVercel 대시보드 > Settings > Environment Variables에서 API_KEY가 정확히 설정되었는지 확인 후, 다시 배포(Redeploy)해주세요.';
+            if (errorMessage.includes('API 키가 설정되지 않았습니다')) {
+                userFriendlyMessage += '\n\n[해결 방법]\n1. Vercel 프로젝트 대시보드로 이동하세요.\n2. Settings > Environment Variables 메뉴를 확인하세요.\n3. 이름이 "API_KEY"이고, Production 환경에 체크된 변수가 있는지 확인하세요.\n4. 없다면 추가하고, 변경했다면 **캐시 없이 다시 배포(Redeploy)**해주세요.';
+            } else {
+                userFriendlyMessage += "\n\n[다음 단계]\nVercel 대시보드의 'Logs' 탭에서 자세한 서버 오류를 확인해보세요.";
             }
 
-            alert(`AI 썸네일 생성 중 오류가 발생했습니다:\n${errorMessage}`);
+            alert(userFriendlyMessage);
         } finally {
             setIsLoading(false);
         }
@@ -758,8 +762,6 @@ const App = () => {
 
             if (format === 'jpeg') {
                 dataUrl = await htmlToImage.toJpeg(element, { ...options, quality: 0.9 });
-            // FIX: The 'html-to-image' library does not have a 'toWebp' method.
-            // This fix generates a canvas first using 'toCanvas' and then converts it to a WebP data URL.
             } else if (format === 'webp') {
                 const canvas = await htmlToImage.toCanvas(element, options);
                 dataUrl = canvas.toDataURL('image/webp', 0.95);
