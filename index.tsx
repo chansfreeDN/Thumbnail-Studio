@@ -164,9 +164,9 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 720 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 580 } },
-    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 380 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 750 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 620 } },
+    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 420 } },
     { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
     { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
     { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 400 } },
@@ -954,7 +954,7 @@ const App = () => {
     );
     
     const renderAiPanel = () => (
-        <div className="settings-panel-content">
+        <div className="settings-panel-content ai-settings-panel">
             <p className="card-description">블로그 글의 제목과 내용을 입력하면 AI가 썸네일에 어울리는 제목, 카테고리, 스타일을 자동으로 추천해줍니다.</p>
             <div className="form-group">
                 <label htmlFor="blog-title-input">블로그 제목:</label>
@@ -978,7 +978,7 @@ const App = () => {
     );
     
     const renderContentPanel = () => (
-        <div className="settings-panel-content">
+        <div className="settings-panel-content content-settings-panel">
             <div className="form-group">
                 <label htmlFor="title-input">썸네일 제목:</label>
                 <textarea id="title-input" value={title} onChange={e => { setTitle(e.target.value); setIsContentLoaded(true); }} />

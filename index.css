@@ -312,6 +312,41 @@ body.is-resizing-br, body.is-resizing-br * { cursor: nwse-resize !important; use
     max-width: none;
 }
 
+/* Flexbox layout for problematic panels to prevent overflow */
+.content-settings-panel,
+.ai-settings-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.content-settings-panel .form-group {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-settings-panel .form-group textarea {
+    flex-grow: 1;
+    resize: none;
+}
+
+.ai-settings-panel .form-group:last-of-type {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-settings-panel .form-group:last-of-type textarea {
+    flex-grow: 1;
+    resize: none;
+}
+
+.ai-settings-panel .btn-ai {
+    flex-shrink: 0;
+    margin-top: 1rem;
+}
+
 /* Category Selection */
 .category-grid {
     display: grid;
