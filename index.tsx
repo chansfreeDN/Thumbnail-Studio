@@ -685,31 +685,33 @@ const App = () => {
             alert("블로그 제목과 내용을 모두 입력해주세요.");
             return;
         }
-
+    
         setIsLoading(true);
         try {
             const apiResponse = await fetch('/api/generate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    blogTitle,
-                    blogDescription,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ blogTitle, blogDescription }),
             });
-
-            const result = await apiResponse.json();
-
+    
             if (!apiResponse.ok) {
-                const serverErrorMessage = result.error || '알 수 없는 서버 오류가 발생했습니다.';
-                throw new Error(serverErrorMessage);
+                const errorText = await apiResponse.text();
+                let errorMessage = errorText;
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.error || errorText;
+                } catch (e) {
+                    // It's not JSON, so we'll use the raw text.
+                }
+                throw new Error(`[${apiResponse.status}] ${errorMessage}`);
             }
-
+    
+            const result = await apiResponse.json();
+    
             setTitle(result.thumbnailTitle);
             setSubtitle(result.thumbnailSubtitle);
             setIsContentLoaded(true);
-
+    
             const newCategory = result.category;
             if (CATEGORIES.includes(newCategory)) {
                 handleCategorySelect(newCategory);
@@ -717,19 +719,21 @@ const App = () => {
                 console.warn(`AI가 추천한 카테고리 '${newCategory}'가 목록에 없습니다. 기본 카테고리를 사용합니다.`);
                 handleCategorySelect(CATEGORIES[0]);
             }
-
+    
         } catch (error) {
             console.error('AI 썸네일 생성 요청에 실패했습니다.', error);
             const serverErrorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
-
+    
             let userFriendlyMessage = `AI 자동 생성에 실패했습니다.\n\n[서버 응답]\n${serverErrorMessage}\n\n`;
-        
-            if (serverErrorMessage.includes('API 키가 설정되지 않았습니다')) {
+    
+            if (serverErrorMessage.includes('API 키가 설정되지 않았습니다') || serverErrorMessage.includes('API_KEY')) {
                 userFriendlyMessage += `[가장 가능성이 높은 원인]\n배포된 웹사이트에서 AI 기능을 사용하기 위한 'API 키'가 등록되지 않았습니다.\n\n[해결 방법]\n1. Vercel 프로젝트 대시보드에 로그인하세요.\n2. [Settings] 탭 > [Environment Variables] 메뉴로 이동하세요.\n3. 이름(Name)에 \`API_KEY\` 를, 값(Value)에 발급받은 Gemini API 키를 정확히 입력하세요.\n4. **Production 환경에 반드시 체크**한 후 저장하세요.\n5. 변경사항을 적용하기 위해, [Deployments] 탭에서 **가장 최근 배포를 찾아 'Redeploy'**를 눌러주세요. (캐시 없이 재배포 권장)`;
+            } else if (serverErrorMessage.includes('504') || serverErrorMessage.toLowerCase().includes('timeout')) {
+                userFriendlyMessage += `[다음 단계]\n서버 응답 시간이 초과되었습니다. Vercel Hobby 플랜의 경우, AI 요청이 10초 이상 소요되면 이 오류가 발생할 수 있습니다. 잠시 후 다시 시도해보세요. 문제가 계속되면 서버 로그를 확인해주세요.`;
             } else {
                 userFriendlyMessage += "[다음 단계]\n문제가 계속되면 Vercel 대시보드의 'Functions' 또는 'Logs' 탭에서 자세한 서버 오류를 확인하여 원인을 파악해보세요.";
             }
-        
+    
             alert(userFriendlyMessage);
         } finally {
             setIsLoading(false);

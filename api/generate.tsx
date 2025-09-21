@@ -92,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } catch (error) {
         console.error('--- [FATAL ERROR] AI 생성 프로세스 중 오류 발생 ---');
-        console.error(error); 
+        console.error('Error object:', JSON.stringify(error, null, 2));
         
         const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
         return res.status(500).json({ error: `AI 썸네일 생성에 실패했습니다: ${errorMessage}` });
