@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, DragEvent, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as htmlToImage from 'html-to-image';
@@ -163,12 +164,12 @@ type DraggableElementState = {
 };
 
 const settingsPanelsConfig = [
-    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 620 } },
-    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 420 } },
-    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 280 } },
-    { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 380 } },
-    { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 320 } },
-    { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 380 } },
+    { id: 'image', title: '이미지 설정', icon: <ImageIcon />, defaultSize: { width: 360, height: 650 } },
+    { id: 'ai', title: 'AI 자동 생성', icon: <AIIcon />, defaultSize: { width: 380, height: 450 } },
+    { id: 'content', title: '콘텐츠 설정', icon: <ContentIcon />, defaultSize: { width: 380, height: 300 } },
+    { id: 'adjustment', title: '수동 조절', icon: <SlidersIcon />, defaultSize: { width: 580, height: 420 } },
+    { id: 'background', title: '배경 패턴', icon: <StyleIcon />, defaultSize: { width: 420, height: 340 } },
+    { id: 'category', title: '카테고리 선택', icon: <CategoryIcon />, defaultSize: { width: 420, height: 400 } },
 ];
 
 interface FloatingPanelProps {
@@ -447,7 +448,7 @@ const App = () => {
         setOpenPanels(currentPanels => {
             const adjustmentPanel = currentPanels.find(p => p.id === 'adjustment');
             if (adjustmentPanel) {
-                const targetHeight = activePlatform === 'blog' ? 380 : 290;
+                const targetHeight = activePlatform === 'blog' ? 420 : 330;
                 if (adjustmentPanel.size.height !== targetHeight) {
                     return currentPanels.map(p =>
                         p.id === 'adjustment'
@@ -470,7 +471,7 @@ const App = () => {
             if (panelConfig) {
                 let panelSize = panelConfig.defaultSize;
                 if (panelId === 'adjustment') {
-                    const targetHeight = activePlatform === 'blog' ? 380 : 290;
+                    const targetHeight = activePlatform === 'blog' ? 420 : 330;
                     panelSize = { ...panelSize, height: targetHeight };
                 }
                 const newZIndex = nextZIndex;
