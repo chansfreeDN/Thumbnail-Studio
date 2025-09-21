@@ -314,9 +314,14 @@ body.is-resizing-br, body.is-resizing-br * { cursor: nwse-resize !important; use
 
 /* Flexbox layout for problematic panels to prevent overflow */
 .content-settings-panel,
-.ai-settings-panel {
+.ai-settings-panel,
+.image-settings-panel {
     display: flex;
     flex-direction: column;
+}
+
+.content-settings-panel,
+.ai-settings-panel {
     height: 100%;
 }
 
@@ -472,11 +477,13 @@ body.is-resizing-br, body.is-resizing-br * { cursor: nwse-resize !important; use
 }
 
 .image-settings-panel {
-    display: flex;
-    flex-direction: column;
     gap: 1.25rem;
+}
+/* When image is not uploaded, make panel fill height */
+.image-settings-panel:has(.image-upload-zone-compact) {
     height: 100%;
 }
+
 .image-settings-panel .image-upload-zone-compact {
     flex-grow: 1;
     width: 100%;
@@ -566,7 +573,6 @@ body.is-resizing-br, body.is-resizing-br * { cursor: nwse-resize !important; use
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: auto;
 }
 
 .vignette-group {
