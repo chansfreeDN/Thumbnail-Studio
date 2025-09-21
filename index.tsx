@@ -1,15 +1,18 @@
+
 import React, { useState, useRef, DragEvent, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as htmlToImage from 'html-to-image';
+import { Options } from 'html-to-image/lib/types';
 
 
 // --- DATA ---
 const CATEGORIES = [
     "기술 & 혁신", "라이프스타일 & 건강", "음식 & 레시피", "여행 & 모험",
     "비즈니스 & 금융", "예술 & 창의성", "교육 & 학습", "건강 & 피트니스", "자연 & 환경"
-];
+] as const;
+type Category = typeof CATEGORIES[number];
 
-const CATEGORY_STYLES = {
+const CATEGORY_STYLES: Record<Category, string> = {
     "기술 & 혁신": "linear-gradient(45deg, #37474F, #263238)",
     "라이프스타일 & 건강": "linear-gradient(45deg, #66BB6A, #43A047)",
     "음식 & 레시피": "linear-gradient(45deg, #F9A825, #FDD835)",
@@ -26,7 +29,7 @@ const LIFESTYLE_DEFAULTS = {
     subtitleWeight: 600, subtitleSize: 1.5, subtitleColor: '#E0E0E0', ratio: '1:1'
 };
 
-const CATEGORY_DEFAULT_SETTINGS = {
+const CATEGORY_DEFAULT_SETTINGS: Record<Category, typeof LIFESTYLE_DEFAULTS> = {
     "기술 & 혁신": LIFESTYLE_DEFAULTS,
     "라이프스타일 & 건강": LIFESTYLE_DEFAULTS,
     "음식 & 레시피": LIFESTYLE_DEFAULTS,
@@ -77,6 +80,24 @@ const RATIO_CONFIG: Record<string, { width: number; height: number }> = {
     '16:9': { width: 1920, height: 1080 }
 };
 
+// --- TYPES ---
+interface PlatformSettings {
+    title: string;
+    subtitle: string;
+    category: Category;
+    ratio: keyof typeof RATIO_CONFIG;
+    titleSize?: number;
+    titleWeight?: number;
+    textEffect?: TextEffect;
+}
+
+interface PlatformPreset {
+    id: string;
+    title: string;
+    icon: JSX.Element;
+    settings: PlatformSettings;
+}
+
 // --- HELPERS ---
 const getTextEffectStyle = (effect: TextEffect, color: string): React.CSSProperties => {
     switch (effect) {
@@ -115,7 +136,7 @@ const YouTubeIcon = () => <svg viewBox="0 0 24 24"><path d="M21.58 7.19c-.23-.86
 const SNSIcon = () => <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 01-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 017.8 2zm-.2 2A3.6 3.6 0 004 7.6v8.8A3.6 3.6 0 007.6 20h8.8A3.6 3.6 0 0020 16.4V7.6A3.6 3.6 0 0016.4 4H7.6zm9.65 1.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"></path></svg>;
 const DownloadIcon = () => <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>;
 
-const PLATFORM_PRESETS = [
+const PLATFORM_PRESETS: PlatformPreset[] = [
     {
         id: 'blog',
         title: '블로그',
@@ -312,7 +333,13 @@ const FloatingPanel: React.FC<FloatingPanelProps> = ({ title, children, initialP
     );
 };
 
-const Modal = ({ isOpen, onClose, children }) => {
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     return (
@@ -326,8 +353,8 @@ const Modal = ({ isOpen, onClose, children }) => {
 };
 
 const App = () => {
-    const initialCategory = "라이프스타일 & 건강";
-    const getDefaults = (cat) => CATEGORY_DEFAULT_SETTINGS[cat] || CATEGORY_DEFAULT_SETTINGS[initialCategory];
+    const initialCategory: Category = "라이프스타일 & 건강";
+    const getDefaults = (cat: Category) => CATEGORY_DEFAULT_SETTINGS[cat] || CATEGORY_DEFAULT_SETTINGS[initialCategory];
     
     // App Layout State
     const [activePlatform, setActivePlatform] = useState<string | null>(null);
@@ -347,7 +374,7 @@ const App = () => {
     // Content State
     const [title, setTitle] = useState("미니멀 라이프 시작하기");
     const [subtitle, setSubtitle] = useState("일상 속 작은 변화의 시작");
-    const [category, setCategory] = useState(initialCategory);
+    const [category, setCategory] = useState<Category>(initialCategory);
     
     // Style State
     const [backgroundStyle, setBackgroundStyle] = useState(CATEGORY_STYLES[initialCategory]);
@@ -518,7 +545,7 @@ const App = () => {
         setSubtitlePosition({ x: 0, y: 0 });
     };
     
-    const applyPlatformSettings = (platformSettings) => {
+    const applyPlatformSettings = (platformSettings: PlatformSettings) => {
         const newCategory = platformSettings.category;
         const defaults = getDefaults(newCategory);
 
@@ -538,7 +565,7 @@ const App = () => {
         setSubtitleHex(defaults.subtitleColor);
         
         setBackgroundStyle(CATEGORY_STYLES[newCategory]);
-        setTextEffect((platformSettings.textEffect as TextEffect) || 'soft-shadow');
+        setTextEffect(platformSettings.textEffect || 'soft-shadow');
 
         if (!backgroundImage) {
             setImageFilters({ brightness: 100, contrast: 100, blur: 0 });
@@ -548,13 +575,13 @@ const App = () => {
         resetTextPositions();
     };
 
-    const handlePlatformSelect = (platform) => {
+    const handlePlatformSelect = (platform: PlatformPreset | undefined) => {
         if (!platform) return;
         setActivePlatform(platform.id);
         applyPlatformSettings(platform.settings);
     };
 
-    const handleCategorySelect = (selectedCategory) => {
+    const handleCategorySelect = (selectedCategory: Category) => {
         const defaults = getDefaults(selectedCategory);
 
         setCategory(selectedCategory);
@@ -714,7 +741,7 @@ const App = () => {
     
             const newCategory = result.category;
             if (CATEGORIES.includes(newCategory)) {
-                handleCategorySelect(newCategory);
+                handleCategorySelect(newCategory as Category);
             } else {
                 console.warn(`AI가 추천한 카테고리 '${newCategory}'가 목록에 없습니다. 기본 카테고리를 사용합니다.`);
                 handleCategorySelect(CATEGORIES[0]);
@@ -757,16 +784,15 @@ const App = () => {
     
         let dataUrl: string;
         try {
-            const options = {
+            const options: Options = {
                 quality: 1,
-                backgroundColor: null,
                 width: targetWidth,
                 height: targetHeight,
                 pixelRatio: 1,
             };
 
             if (format === 'jpeg') {
-                dataUrl = await htmlToImage.toJpeg(element, { ...options, quality: 0.9 });
+                dataUrl = await htmlToImage.toJpeg(element, { ...options, quality: 0.9, backgroundColor: 'white' });
             } else if (format === 'webp') {
                 const canvas = await htmlToImage.toCanvas(element, options);
                 dataUrl = canvas.toDataURL('image/webp', 0.95);
@@ -805,7 +831,8 @@ const App = () => {
             document.body.removeChild(link);
         } catch (error) {
             console.error('이미지 저장에 실패했습니다.', error);
-            alert(`이미지 저장 중 오류가 발생했습니다: ${error.message}`);
+            const message = error instanceof Error ? error.message : String(error);
+            alert(`이미지 저장 중 오류가 발생했습니다: ${message}`);
         } finally {
             setIsSaving(false);
         }
