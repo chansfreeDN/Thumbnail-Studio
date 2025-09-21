@@ -320,32 +320,29 @@ body.is-resizing-br, body.is-resizing-br * { cursor: nwse-resize !important; use
     height: 100%;
 }
 
+/* Make form groups flexible and allow them to shrink properly */
+.ai-settings-panel .form-group,
 .content-settings-panel .form-group {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0; /* Prevents overflow by allowing shrinking below content size */
 }
 
+/* Ensure textareas fill the available space within their form group */
+.ai-settings-panel .form-group textarea,
 .content-settings-panel .form-group textarea {
     flex-grow: 1;
     resize: none;
+    min-height: 0; /* Good practice for nested flex items */
 }
 
-.ai-settings-panel .form-group:last-of-type {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.ai-settings-panel .form-group:last-of-type textarea {
-    flex-grow: 1;
-    resize: none;
-}
-
+/* Keep the AI button at a fixed size at the bottom */
 .ai-settings-panel .btn-ai {
     flex-shrink: 0;
     margin-top: 1rem;
 }
+
 
 /* Category Selection */
 .category-grid {
