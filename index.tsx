@@ -2,6 +2,7 @@ import React, { useState, useRef, DragEvent, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as htmlToImage from 'html-to-image';
 
+
 // --- DATA ---
 const CATEGORIES = [
     "기술 & 혁신", "라이프스타일 & 건강", "음식 & 레시피", "여행 & 모험",
@@ -719,16 +720,16 @@ const App = () => {
 
         } catch (error) {
             console.error('AI 썸네일 생성 요청에 실패했습니다.', error);
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const serverErrorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
 
-            let userFriendlyMessage = `AI 썸네일 생성 중 오류가 발생했습니다.\n\n[오류 내용]\n${errorMessage}`;
-            
-            if (errorMessage.includes('API 키가 설정되지 않았습니다')) {
-                userFriendlyMessage += '\n\n[해결 방법]\n1. Vercel 프로젝트 대시보드로 이동하세요.\n2. Settings > Environment Variables 메뉴를 확인하세요.\n3. 이름이 "API_KEY"이고, Production 환경에 체크된 변수가 있는지 확인하세요.\n4. 없다면 추가하고, 변경했다면 **캐시 없이 다시 배포(Redeploy)**해주세요.';
+            let userFriendlyMessage = `AI 자동 생성에 실패했습니다.\n\n[서버 응답]\n${serverErrorMessage}\n\n`;
+        
+            if (serverErrorMessage.includes('API 키가 설정되지 않았습니다')) {
+                userFriendlyMessage += `[가장 가능성이 높은 원인]\n배포된 웹사이트에서 AI 기능을 사용하기 위한 'API 키'가 등록되지 않았습니다.\n\n[해결 방법]\n1. Vercel 프로젝트 대시보드에 로그인하세요.\n2. [Settings] 탭 > [Environment Variables] 메뉴로 이동하세요.\n3. 이름(Name)에 \`API_KEY\` 를, 값(Value)에 발급받은 Gemini API 키를 정확히 입력하세요.\n4. **Production 환경에 반드시 체크**한 후 저장하세요.\n5. 변경사항을 적용하기 위해, [Deployments] 탭에서 **가장 최근 배포를 찾아 'Redeploy'**를 눌러주세요. (캐시 없이 재배포 권장)`;
             } else {
-                userFriendlyMessage += "\n\n[다음 단계]\nVercel 대시보드의 'Logs' 탭에서 자세한 서버 오류를 확인해보세요.";
+                userFriendlyMessage += "[다음 단계]\n문제가 계속되면 Vercel 대시보드의 'Functions' 또는 'Logs' 탭에서 자세한 서버 오류를 확인하여 원인을 파악해보세요.";
             }
-
+        
             alert(userFriendlyMessage);
         } finally {
             setIsLoading(false);

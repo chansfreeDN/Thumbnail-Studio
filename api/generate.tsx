@@ -14,16 +14,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ message: 'POST 요청만 허용됩니다.' });
     }
 
+    console.log('[API Key Check] Vercel 환경 변수에서 API_KEY를 로드합니다...');
     const apiKey = process.env.API_KEY;
 
-    // --- 강화된 API 키 검증 ---
     if (!apiKey || apiKey.trim() === '') {
         console.error('[CRITICAL] API_KEY 환경 변수가 설정되지 않았거나 비어 있습니다.');
         console.log('Vercel 대시보드 > Settings > Environment Variables 에서 API_KEY가 올바르게 설정되었는지, 그리고 Production 환경에 적용되었는지 확인하세요.');
+        // This specific error message is caught by the frontend to provide detailed instructions.
         return res.status(500).json({ error: '서버에 API 키가 설정되지 않았습니다. Vercel 프로젝트 설정을 확인해주세요.' });
     }
-    // API 키가 존재하는지 확인하기 위한 로그 (키 자체는 노출하지 않음)
-    console.log(`[API Check] API 키가 성공적으로 로드되었습니다. (길이: ${apiKey.length})`);
+    console.log(`[API Key Check] API 키가 성공적으로 로드되었습니다. (Key's length: ${apiKey.length})`);
 
     const { blogTitle, blogDescription } = req.body;
     if (!blogTitle || !blogDescription) {
@@ -77,19 +77,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const rawText = response.text;
         console.log('[Gemini Raw Text]:', rawText);
 
-        // --- 강화된 JSON 파싱 ---
         let result;
         try {
-            // Gemini가 JSON 모드에서 추가 문자를 붙이는 경우가 있으므로, JSON 객체만 추출
-            const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-            if (!jsonMatch) {
-                throw new Error("응답에서 유효한 JSON 객체를 찾을 수 없습니다.");
-            }
-            result = JSON.parse(jsonMatch[0]);
+            const cleanedText = rawText.replace(/^```json\s*|```\s*$/g, '').trim();
+            result = JSON.parse(cleanedText);
         } catch(parseError) {
              console.error('[JSON Parse Error] Gemini 응답 파싱 실패.', parseError);
              console.error('원본 응답 텍스트:', rawText);
-             throw new Error('AI가 반환한 데이터 형식이 올바르지 않습니다.');
+             throw new Error('AI가 반환한 데이터 형식이 올바르지 않습니다 (JSON 파싱 실패).');
         }
         
         console.log('[Success] 최종 결과 객체:', result);
