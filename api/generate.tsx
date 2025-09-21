@@ -75,6 +75,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         console.log('[Gemini Response] Gemini API로부터 성공적으로 응답을 받았습니다.');
         const rawText = response.text;
+        
+        if (!rawText) {
+            console.error('[CRITICAL] Gemini 응답이 비어있습니다. 안전 필터에 의해 차단되었을 수 있습니다.');
+            console.error('Full Gemini Response:', JSON.stringify(response, null, 2));
+            throw new Error('AI로부터 유효한 응답을 받지 못했습니다. 콘텐츠가 안전 필터에 의해 차단되었을 수 있습니다.');
+        }
+
         console.log('[Gemini Raw Text]:', rawText);
 
         let result;
